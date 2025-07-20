@@ -234,8 +234,15 @@
         }
 
         async function callGeminiAPI(prompt) {
-            const apiKey = ""; // Leave empty
+            // IMPORTANT: Paste your new API key here
+            const apiKey = "AIzaSyC9wpPlUniAv6IQRZEO2asMUszwEB_jiO4"; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            // Simple check to prevent sending request without a key
+            if (apiKey === "PASTE_YOUR_NEW_API_KEY_HERE" || apiKey === "") {
+                return "API Key not found. Please follow the instructions to add your API key to the code.";
+            }
+
             const payload = {
                 contents: chatHistory,
                 generationConfig: {
