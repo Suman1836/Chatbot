@@ -1,298 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NCERT Science Chatbot (PCB)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- KaTeX for Math Rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOVEMVIhbCwHMAq2hIoZ4CukTBvCanYoEAbE9gxQXCf5PilTTMBc" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom scrollbar for a cleaner look in dark mode */
-        #chat-window::-webkit-scrollbar {
-            width: 8px;
-        }
-        #chat-window::-webkit-scrollbar-track {
-            background: #1f2937; /* dark gray */
-        }
-        #chat-window::-webkit-scrollbar-thumb {
-            background: #4b5563; /* medium gray */
-            border-radius: 4px;
-        }
-        #chat-window::-webkit-scrollbar-thumb:hover {
-            background: #6b7280; /* lighter gray */
-        }
-        .word-break-break-word {
-             word-break: break-word;
-        }
-        .katex-display {
-            margin: 0.5em 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>NCERT Science Books Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Import MathJax for math rendering -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body {
+      background: linear-gradient(120deg, #f6d365, #fda085, #a8edea, #fed6e3);
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 1.25em;
+      color: #1a1a2e;
+    }
+    h1, h2 {
+      color: #512da8;
+      text-shadow: 1px 1px 3px #ffe;
+      text-align: center;
+      margin-bottom: 0.2em;
+    }
+    .chat-container {
+      max-width: 600px;
+      background: rgba(255,255,255,0.95);
+      margin: 2em auto;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.17);
+      padding: 2em 2em 1em 2em;
+    }
+    .user-message, .bot-message {
+      margin: 1em 0;
+      line-height: 1.7;
+      padding: 1em;
+      border-radius: 15px;
+      max-width: 90%;
+      word-wrap: break-word;
+      transition: background 0.5s;
+      font-size: 1.2em;
+    }
+    .user-message {
+      background-color: #fff3e0;
+      text-align: right;
+      margin-left: auto;
+      border: 2px solid #f9a825;
+    }
+    .bot-message {
+      background-color: #e0f7fa;
+      text-align: left;
+      margin-right: auto;
+      border: 2px solid #0277bd;
+      animation: reveal 1.2s step-end;
+    }
+    @keyframes reveal {
+      0% { opacity: 0; transform: translateY(20px);}
+      100% { opacity: 1; transform: translateY(0);}
+    }
+    .motivational {
+      background: linear-gradient(100deg, #e0c3fc, #8ec5fc 80%);
+      margin: 1em 0;
+      padding: 0.8em 1em;
+      border-radius: 10px;
+      color: #28446e;
+      font-weight: 600;
+      font-size: 1.1em;
+      border-left: 6px solid #512da8;
+      text-align: center;
+    }
+    .book-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1em 0;
+      font-size: 1.15em;
+    }
+    .book-table th, .book-table td {
+      border: 1px solid #b39ddb;
+      padding: 0.7em;
+      text-align: left;
+    }
+    .book-table th {
+      background: #b3e5fc;
+      color: #1a237e;
+    }
+    .book-table tr:nth-child(even) {
+      background: #f3e5f5;
+    }
+    .math {
+      background: #f1f8e9;
+      border-left: 6px solid #66bb6a;
+      margin: 1em 0;
+      padding: 0.7em 1.3em;
+      border-radius: 6px;
+      font-size: 1.1em;
+      color: #00695c;
+      font-family: 'Roboto Mono', Consolas, monospace;
+    }
+    .input-area {
+      display: flex;
+      margin: 1.3em 0 0 0;
+    }
+    .input-area input, .input-area button {
+      font-size: 1.15em;
+      padding: 0.7em;
+      border-radius: 9px;
+      border: none;
+    }
+    .input-area input {
+      flex: 1;
+      margin-right: 0.8em;
+      background: #e0f2f1;
+    }
+    .input-area button {
+      background: #43a047;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .input-area button:hover {
+      background: #388e3c;
+    }
+    @media (max-width:700px) {
+      .chat-container { padding: 1em; }
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center h-screen p-4">
-
-    <div class="w-full max-w-2xl h-full flex flex-col bg-gray-800 bg-opacity-80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50">
-        <!-- Chatbot Header -->
-        <div class="p-4 border-b border-gray-700/50 flex items-center justify-between rounded-t-2xl bg-gray-900/70">
-            <div class="flex items-center space-x-4">
-                 <div class="relative flex items-center justify-center w-12 h-12 bg-indigo-600 rounded-full">
-                    <svg class="w-7 h-7 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                    </svg>
-                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full"></span>
-                 </div>
-                <div>
-                    <h1 class="text-xl font-bold text-white">NCERT Science Assistant</h1>
-                    <p class="text-sm text-gray-300">Physics, Chemistry, Biology</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Window -->
-        <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-6">
-            <!-- Messages will be appended here -->
-        </div>
-
-        <!-- Typing Indicator -->
-        <div id="typing-indicator" class="p-6 pt-0 hidden">
-            <div class="flex items-center space-x-2">
-                <div class="w-2.5 h-2.5 bg-gray-400 rounded-full animate-pulse" style="animation-delay: 0s;"></div>
-                <div class="w-2.5 h-2.5 bg-gray-400 rounded-full animate-pulse" style="animation-delay: 0.2s;"></div>
-                <div class="w-2.5 h-2.5 bg-gray-400 rounded-full animate-pulse" style="animation-delay: 0.4s;"></div>
-                <span class="text-sm text-gray-400">Assistant is thinking...</span>
-            </div>
-        </div>
-
-
-        <!-- Input Form -->
-        <div class="p-4 border-t border-gray-700/50 bg-gray-900/70 rounded-b-2xl">
-            <form id="chat-form" class="flex items-center space-x-3">
-                <input type="text" id="message-input" placeholder="Ask about Physics, Chemistry, or Biology..." autocomplete="off" class="flex-1 w-full px-4 py-3 bg-gray-800 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200 text-base">
-                <button type="submit" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition duration-200 flex items-center">
-                    Send
-                    <svg class="w-5 h-5 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.949a.75.75 0 00.95.544l3.535-1.212a.75.75 0 01.638 1.268l-3.535 1.212a.75.75 0 00-.544.95l-1.414 4.95a.75.75 0 00.95.826l13.5-4.5a.75.75 0 000-1.392l-13.5-4.5z" />
-                    </svg>
-                </button>
-            </form>
-        </div>
+<body>
+  <h1>NCERT Books Chatbot</h1>
+  <h2>Class 11 & 12: Biology, Chemistry, Physics</h2>
+  <div class="motivational">
+    🎯 Ignite Your Curiosity! Every question is a step toward brilliance. Let's explore!
+  </div>
+  <div class="chat-container" id="chat">
+    <div class="bot-message">
+      Hi! 👋 I can help you with details for Class 11 & 12 NCERT books in Biology, Chemistry, and Physics.<br>
+      <span style="color: #388e3c;">Type your subject or topic to start!</span>
     </div>
+  </div>
+  <form class="input-area" onsubmit="return sendMessage();">
+    <input type="text" id="userInput" placeholder="Ask about a chapter, concept, or formula..." autocomplete="off" required />
+    <button type="submit">Send</button>
+  </form>
 
-    <script>
-        // DOM element references
-        const chatWindow = document.getElementById('chat-window');
-        const chatForm = document.getElementById('chat-form');
-        const messageInput = document.getElementById('message-input');
-        const typingIndicator = document.getElementById('typing-indicator');
+  <script>
+    // Simulate human-like step-by-step reveal
+    function typeWriterEffect(element, text, step=1) {
+      let i = 0;
+      function type() {
+        if (i <= text.length) {
+          element.innerHTML = text.slice(0, i);
+          MathJax.typesetPromise(); // For math
+          i += step;
+          setTimeout(type, 25 + Math.random() * 20);
+        }
+      }
+      type();
+    }
 
-        // Conversation history with updated system prompt for LaTeX
-        let chatHistory = [
-            { 
-                role: "user", 
-                parts: [{ text: "You are a helpful and knowledgeable assistant specializing in the NCERT curriculum for Class 11 and Class 12 in India, focusing exclusively on the subjects of Physics, Chemistry, and Biology. Your primary role is to provide accurate information about chapters and topics covered in these specific textbooks. If a user asks about any other subject (like Maths, English, etc.), politely state that you can only provide information on Physics, Chemistry, and Biology. IMPORTANT: For all mathematical equations, formulas, and symbols, you MUST use LaTeX notation. Use $...$ for inline math and $$...$$ for block equations." }]
-            },
-            {
-                role: "model",
-                parts: [{ text: "Okay, I understand. I will act as an expert assistant for Physics, Chemistry, and Biology for NCERT Classes 11 and 12, and I will use LaTeX for all mathematical notation. How can I help you with these subjects today?"}]
-            }
-        ];
+    // Predefined book details
+    const bookData = {
+      "class 11": {
+        "biology": [
+          { title: "NCERT Biology Part I", chapters: 10 },
+          { title: "NCERT Biology Part II", chapters: 10 }
+        ],
+        "chemistry": [
+          { title: "NCERT Chemistry Part I", chapters: 7 },
+          { title: "NCERT Chemistry Part II", chapters: 7 }
+        ],
+        "physics": [
+          { title: "NCERT Physics Part I", chapters: 8 },
+          { title: "NCERT Physics Part II", chapters: 8 }
+        ]
+      },
+      "class 12": {
+        "biology": [
+          { title: "NCERT Biology Part I", chapters: 8 },
+          { title: "NCERT Biology Part II", chapters: 8 }
+        ],
+        "chemistry": [
+          { title: "NCERT Chemistry Part I", chapters: 9 },
+          { title: "NCERT Chemistry Part II", chapters: 7 }
+        ],
+        "physics": [
+          { title: "NCERT Physics Part I", chapters: 8 },
+          { title: "NCERT Physics Part II", chapters: 7 }
+        ]
+      }
+    };
 
-        // --- Core Functions ---
+    // Sample motivational lines to show randomly
+    const motivationLines = [
+      "🌟 Every discovery is a new step to success!",
+      "🤔 Keep questioning, keep learning!",
+      "📚 Dive deep, achievements are just ahead!",
+      "👏 Great question! Let's break it down together."
+    ];
 
-        /**
-         * Renders LaTeX math expressions within a given DOM element.
-         * This function avoids recursion by directly calling the global KaTeX function.
-         * @param {HTMLElement} element - The element to scan for math.
-         */
-        function renderMathInMessage(element) {
-            // Check if the global KaTeX auto-render function is available on the window object
-            if (window.renderMathInElement) {
-                window.renderMathInElement(element, {
-                    delimiters: [
-                        {left: '$$', right: '$$', display: true},
-                        {left: '$', right: '$', display: false},
-                        {left: '\\(', right: '\\)', display: false},
-                        {left: '\\[', right: '\\]', display: true}
-                    ],
-                    throwOnError: false
+    // Suggest chapters and math
+    const mathExamples = {
+      "class 11 physics": [
+        { concept: "Newton's Second Law", equation: "F = m a" },
+        { concept: "Kinetic Energy", equation: "KE = \\frac{1}{2}mv^2" }
+      ],
+      "class 12 chemistry": [
+        { concept: "Gibbs Free Energy", equation: "G = H - TS" }
+      ]
+    };
+
+    // Handle user input and bot responses
+    function sendMessage() {
+      const input = document.getElementById('userInput').value.trim();
+      if (!input) return false;
+      showMessage(input, "user");
+      processQuery(input.toLowerCase());
+      document.getElementById('userInput').value = '';
+      return false;
+    }
+
+    function showMessage(message, sender="bot") {
+      const chat = document.getElementById('chat');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = sender === "user" ? "user-message" : "bot-message";
+      if (sender === 'bot') {
+        msgDiv.innerHTML = '...'; // for typewriter effect
+        chat.appendChild(msgDiv);
+        chat.scrollTop = chat.scrollHeight;
+        setTimeout(() => typeWriterEffect(msgDiv, message), 300);
+      } else {
+        msgDiv.innerText = message;
+        chat.appendChild(msgDiv);
+        chat.scrollTop = chat.scrollHeight;
+      }
+    }
+
+    function processQuery(q) {
+      let found = false;
+      let response = [];
+
+      // Motivational line
+      if (Math.random() > 0.85) {
+        response.push(`<div class="motivational">${motivationLines[Math.floor(Math.random() * motivationLines.length)]}</div>`);
+      }
+
+      for (let cls in bookData) {
+        if (q.includes(cls)) {
+          let subjects = bookData[cls];
+          for (let subject in subjects) {
+            if (q.includes(subject)) {
+              found = true;
+              response.push(`<b>${cls.toUpperCase()} ${subject.charAt(0).toUpperCase() + subject.slice(1)} NCERT Books:</b>`);
+              response.push('<table class="book-table"><tr><th>Book</th><th>Chapters</th></tr>');
+              subjects[subject].forEach(book => {
+                response.push(`<tr><td>${book.title}</td><td>${book.chapters}</td></tr>`);
+              });
+              response.push('</table>');
+              // Add a math example if exists
+              let mathKey = `${cls} ${subject}`;
+              if (mathExamples[mathKey]) {
+                response.push('<div><span class="math">');
+                mathExamples[mathKey].forEach(ex => {
+                  response.push(`<b>${ex.concept}:</b> \\(${ex.equation}\\)<br>`);
                 });
+                response.push('</span></div>');
+              }
             }
+          }
         }
+      }
 
-        /**
-         * Creates and appends a user's message to the chat window.
-         * @param {string} message - The message text.
-         */
-        function appendUserMessage(message) {
-            const messageWrapper = document.createElement('div');
-            messageWrapper.classList.add('flex', 'items-end', 'gap-2', 'justify-end');
+      // Default response
+      if (!found) {
+        response.push(
+          "Sorry, I can only assist with Biology, Chemistry, and Physics for Class 11 & 12 at the moment.<br>" +
+          "<span style='color: #d84315;'>Try asking: <i>Class 12 Chemistry chapters</i> or <i>Class 11 Physics formulas</i>.</span>"
+        );
+      }
 
-            const messageElement = document.createElement('div');
-            messageElement.classList.add(
-                'px-4', 'py-3', 'rounded-xl', 'max-w-xs', 'lg:max-w-md', 'bg-indigo-600', 'text-white', 'text-base', 'word-break-break-word'
-            );
-            messageElement.textContent = message;
-            
-            messageWrapper.appendChild(messageElement);
-            chatWindow.appendChild(messageWrapper);
-            renderMathInMessage(messageElement); // Render math in user message
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-
-        /**
-         * Creates the DOM structure for a bot message, ready for typing.
-         * @returns {HTMLElement} The element where the text should be typed.
-         */
-        function createBotMessageElement() {
-            const messageWrapper = document.createElement('div');
-            messageWrapper.classList.add('flex', 'items-end', 'gap-2', 'justify-start');
-
-            const botAvatar = document.createElement('div');
-            botAvatar.classList.add('w-8', 'h-8', 'rounded-full', 'bg-indigo-600', 'flex-shrink-0', 'flex', 'items-center', 'justify-center');
-            botAvatar.innerHTML = `<svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>`;
-            
-            const messageElement = document.createElement('div');
-            messageElement.classList.add(
-                'px-4', 'py-3', 'rounded-xl', 'max-w-xs', 'lg:max-w-md', 'bg-gray-600', 'text-white', 'text-base', 'word-break-break-word'
-            );
-            
-            messageWrapper.appendChild(botAvatar);
-            messageWrapper.appendChild(messageElement);
-            chatWindow.appendChild(messageWrapper);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-
-            return messageElement;
-        }
-
-        /**
-         * Simulates a typing effect for the bot's response.
-         * @param {HTMLElement} textElement - The element to type the text into.
-         * @param {string} text - The full string to type.
-         * @returns {Promise<void>} A promise that resolves when typing is complete.
-         */
-        function typeMessage(textElement, text) {
-            return new Promise(resolve => {
-                const words = text.split(' ');
-                let i = 0;
-                const typingSpeed = 80; // milliseconds per word
-
-                function typeWord() {
-                    if (i < words.length) {
-                        textElement.textContent += words[i] + ' ';
-                        chatWindow.scrollTop = chatWindow.scrollHeight;
-                        i++;
-                        setTimeout(typeWord, typingSpeed);
-                    } else {
-                        // Once typing is done, render the math
-                        renderMathInMessage(textElement);
-                        resolve();
-                    }
-                }
-                typeWord();
-            });
-        }
-        
-        function showTypingIndicator(show) {
-            typingIndicator.style.display = show ? 'block' : 'none';
-            if(show) chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            const userMessage = messageInput.value.trim();
-
-            if (userMessage) {
-                messageInput.value = '';
-                appendUserMessage(userMessage);
-                chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
-                showTypingIndicator(true);
-                
-                try {
-                    const botResponseText = await callGeminiAPI(userMessage);
-                    showTypingIndicator(false);
-
-                    const botMessageElement = createBotMessageElement();
-                    await typeMessage(botMessageElement, botResponseText);
-                    
-                    chatHistory.push({ role: "model", parts: [{ text: botResponseText }] });
-                } catch (error) {
-                    console.error("Error getting bot response:", error);
-                    showTypingIndicator(false);
-                    const errorElement = createBotMessageElement();
-                    errorElement.textContent = "Sorry, I'm having trouble connecting. Please try again later.";
-                }
-            }
-        }
-
-        async function callGeminiAPI(prompt) {
-            // ===================================================================
-            // ========================= IMPORTANT ===============================
-            //
-            // PASTE YOUR NEW API KEY HERE, INSIDE THE QUOTES
-            //
-            // ===================================================================
-            const apiKey = "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"; 
-            
-            const apiUrl = `https://openrouter.ai/api/v1/chat/completions}`;
-            
-            // Simple check to prevent sending request without a key
-            if (apiKey === "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" || apiKey === "") {
-                return "API Key not found. Please follow the instructions to add your API key to the code.";
-            }
-
-            const payload = {
-                contents: chatHistory,
-                generationConfig: {
-                    temperature: 0.7,
-                    topP: 0.95,
-                    maxOutputTokens: 1024,
-                }
-            };
-            
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const errorBody = await response.json();
-                console.error("API Error Response:", errorBody);
-                throw new Error(`API request failed with status ${response.status}`);
-            }
-
-            const result = await response.json();
-            
-            if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
-                return result.candidates[0].content.parts[0].text;
-            } else {
-                console.error("Unexpected API response structure:", result);
-                return "I'm sorry, I couldn't generate a proper response.";
-            }
-        }
-
-        // --- Initialization ---
-        chatForm.addEventListener('submit', handleFormSubmit);
-
-        window.addEventListener('load', () => {
-            const initialBotMessage = chatHistory.find(m => m.role === 'model').parts[0].text;
-            // The auto-render script might not be loaded yet, so wait a bit.
-            setTimeout(() => {
-                const botMessageElement = createBotMessageElement();
-                typeMessage(botMessageElement, initialBotMessage);
-            }, 100);
-        });
-
-    </script>
+      showMessage(response.join('\n'), "bot");
+    }
+  </script>
 </body>
 </html>
-
