@@ -6,18 +6,36 @@
     <title>NCERT Science Chatbot (PCB)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- KaTeX for Math Rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOVEMVIhbCwHMAq2hIoZ4CukTBvCanYoEAbE9gxQXCf5PilTTMBc" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        #chat-window::-webkit-scrollbar { width: 8px; }
-        #chat-window::-webkit-scrollbar-track { background: #1f2937; }
-        #chat-window::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-        #chat-window::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-        .word-break-break-word { word-break: break-word; }
-        .katex-display { margin: 0.5em 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for a cleaner look in dark mode */
+        #chat-window::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chat-window::-webkit-scrollbar-track {
+            background: #1f2937; /* dark gray */
+        }
+        #chat-window::-webkit-scrollbar-thumb {
+            background: #4b5563; /* medium gray */
+            border-radius: 4px;
+        }
+        #chat-window::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* lighter gray */
+        }
+        .word-break-break-word {
+             word-break: break-word;
+        }
+        .katex-display {
+            margin: 0.5em 0;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center h-screen p-4">
@@ -54,6 +72,7 @@
             </div>
         </div>
 
+
         <!-- Input Form -->
         <div class="p-4 border-t border-gray-700/50 bg-gray-900/70 rounded-b-2xl">
             <form id="chat-form" class="flex items-center space-x-3">
@@ -75,21 +94,27 @@
         const messageInput = document.getElementById('message-input');
         const typingIndicator = document.getElementById('typing-indicator');
 
-        // Conversation history (Moonshot expects {role: ..., content: ...})
+        // Conversation history with updated system prompt for LaTeX
         let chatHistory = [
             { 
                 role: "user", 
-                content: "You are a helpful and knowledgeable assistant specializing in the NCERT curriculum for Class 11 and Class 12 in India, focusing exclusively on the subjects of Physics, Chemistry, and Biology. Your primary role is to provide accurate information about chapters and topics covered in these specific textbooks. If a user asks about any other subject (like Maths, English, etc.), politely state that you can only provide information on Physics, Chemistry, and Biology. IMPORTANT: For all mathematical equations, formulas, and symbols, you MUST use LaTeX notation. Use $...$ for inline math and $$...$$ for block equations."
+                parts: [{ text: "You are a helpful and knowledgeable assistant specializing in the NCERT curriculum for Class 11 and Class 12 in India, focusing exclusively on the subjects of Physics, Chemistry, and Biology. Your primary role is to provide accurate information about chapters and topics covered in these specific textbooks. If a user asks about any other subject (like Maths, English, etc.), politely state that you can only provide information on Physics, Chemistry, and Biology. IMPORTANT: For all mathematical equations, formulas, and symbols, you MUST use LaTeX notation. Use $...$ for inline math and $$...$$ for block equations." }]
             },
             {
-                role: "assistant",
-                content: "Okay, I understand. I will act as an expert assistant for Physics, Chemistry, and Biology for NCERT Classes 11 and 12, and I will use LaTeX for all mathematical notation. How can I help you with these subjects today?"
+                role: "model",
+                parts: [{ text: "Okay, I understand. I will act as an expert assistant for Physics, Chemistry, and Biology for NCERT Classes 11 and 12, and I will use LaTeX for all mathematical notation. How can I help you with these subjects today?"}]
             }
         ];
 
         // --- Core Functions ---
 
+        /**
+         * Renders LaTeX math expressions within a given DOM element.
+         * This function avoids recursion by directly calling the global KaTeX function.
+         * @param {HTMLElement} element - The element to scan for math.
+         */
         function renderMathInMessage(element) {
+            // Check if the global KaTeX auto-render function is available on the window object
             if (window.renderMathInElement) {
                 window.renderMathInElement(element, {
                     delimiters: [
@@ -103,20 +128,30 @@
             }
         }
 
+        /**
+         * Creates and appends a user's message to the chat window.
+         * @param {string} message - The message text.
+         */
         function appendUserMessage(message) {
             const messageWrapper = document.createElement('div');
             messageWrapper.classList.add('flex', 'items-end', 'gap-2', 'justify-end');
+
             const messageElement = document.createElement('div');
             messageElement.classList.add(
                 'px-4', 'py-3', 'rounded-xl', 'max-w-xs', 'lg:max-w-md', 'bg-indigo-600', 'text-white', 'text-base', 'word-break-break-word'
             );
             messageElement.textContent = message;
+            
             messageWrapper.appendChild(messageElement);
             chatWindow.appendChild(messageWrapper);
-            renderMathInMessage(messageElement);
+            renderMathInMessage(messageElement); // Render math in user message
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
+        /**
+         * Creates the DOM structure for a bot message, ready for typing.
+         * @returns {HTMLElement} The element where the text should be typed.
+         */
         function createBotMessageElement() {
             const messageWrapper = document.createElement('div');
             messageWrapper.classList.add('flex', 'items-end', 'gap-2', 'justify-start');
@@ -138,11 +173,18 @@
             return messageElement;
         }
 
+        /**
+         * Simulates a typing effect for the bot's response.
+         * @param {HTMLElement} textElement - The element to type the text into.
+         * @param {string} text - The full string to type.
+         * @returns {Promise<void>} A promise that resolves when typing is complete.
+         */
         function typeMessage(textElement, text) {
             return new Promise(resolve => {
                 const words = text.split(' ');
                 let i = 0;
-                const typingSpeed = 80;
+                const typingSpeed = 80; // milliseconds per word
+
                 function typeWord() {
                     if (i < words.length) {
                         textElement.textContent += words[i] + ' ';
@@ -150,6 +192,7 @@
                         i++;
                         setTimeout(typeWord, typingSpeed);
                     } else {
+                        // Once typing is done, render the math
                         renderMathInMessage(textElement);
                         resolve();
                     }
@@ -157,7 +200,7 @@
                 typeWord();
             });
         }
-
+        
         function showTypingIndicator(show) {
             typingIndicator.style.display = show ? 'block' : 'none';
             if(show) chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -170,17 +213,17 @@
             if (userMessage) {
                 messageInput.value = '';
                 appendUserMessage(userMessage);
-                chatHistory.push({ role: "user", content: userMessage });
+                chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
                 showTypingIndicator(true);
-
+                
                 try {
-                    const botResponseText = await callMoonshotAPI(userMessage);
+                    const botResponseText = await callGeminiAPI(userMessage);
                     showTypingIndicator(false);
 
                     const botMessageElement = createBotMessageElement();
                     await typeMessage(botMessageElement, botResponseText);
-
-                    chatHistory.push({ role: "assistant", content: botResponseText });
+                    
+                    chatHistory.push({ role: "model", parts: [{ text: botResponseText }] });
                 } catch (error) {
                     console.error("Error getting bot response:", error);
                     showTypingIndicator(false);
@@ -190,44 +233,41 @@
             }
         }
 
-        // --- MOONSHOT API: change API KEY and model as needed!
-        async function callMoonshotAPI(prompt) {
-            // Insert your actual Moonshot API key below
-            const apiKey = "sk-h23GXCrLJ1IxphRUw454By9L1ryGL5NLGb8d5GadZXTtIDn4"; // <-- CHANGE THIS!
-            const apiUrl = "https://api.moonshot.com/v1/chat/completions";
-            const modelName = "moonshot-1-8k"; // Or whichever Moonshot model you want to use
-
-            if (apiKey === "sk-h23GXCrLJ1IxphRUw454By9L1ryGL5NLGb8d5GadZXTtIDn4" || !apiKey) {
-                return "API Key not found. Please add your Moonshot API key to the code.";
+        async function callGeminiAPI(prompt) {
+            // IMPORTANT: Paste your new API key here
+            const apiKey = "AIzaSyC9wpPlUniAv6IQRZEO2asMUszwEB_jiO4"; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            // Simple check to prevent sending request without a key
+            if (apiKey === "AIzaSyC9wpPlUniAv6IQRZEO2asMUszwEB_jiO4" || apiKey === "") {
+                return "API Key not found. Please follow the instructions to add your API key to the code.";
             }
 
-            // If needed, reformat chatHistory (should all be {role, content}) for API
             const payload = {
-                model: modelName,
-                messages: chatHistory,
-                max_tokens: 1024,
-                temperature: 0.7
+                contents: chatHistory,
+                generationConfig: {
+                    temperature: 0.7,
+                    topP: 0.95,
+                    maxOutputTokens: 1024,
+                }
             };
-
+            
             const response = await fetch(apiUrl, {
                 method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${apiKey}`
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
             if (!response.ok) {
-                let errorBody;
-                try { errorBody = await response.json(); } catch(e) { errorBody = {}; }
+                const errorBody = await response.json();
                 console.error("API Error Response:", errorBody);
                 throw new Error(`API request failed with status ${response.status}`);
             }
 
             const result = await response.json();
-            if (result.choices && result.choices[0] && result.choices[0].message && result.choices[0].message.content) {
-                return result.choices[0].message.content;
+            
+            if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                return result.candidates[0].content.parts[0].text;
             } else {
                 console.error("Unexpected API response structure:", result);
                 return "I'm sorry, I couldn't generate a proper response.";
@@ -238,12 +278,14 @@
         chatForm.addEventListener('submit', handleFormSubmit);
 
         window.addEventListener('load', () => {
-            const initialBotMessage = chatHistory.find(m => m.role === 'assistant').content;
+            const initialBotMessage = chatHistory.find(m => m.role === 'model').parts[0].text;
+            // The auto-render script might not be loaded yet, so wait a bit.
             setTimeout(() => {
                 const botMessageElement = createBotMessageElement();
                 typeMessage(botMessageElement, initialBotMessage);
             }, 100);
         });
+
     </script>
 </body>
 </html>
