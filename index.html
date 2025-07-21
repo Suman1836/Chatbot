@@ -234,8 +234,14 @@
         }
 
         async function callGeminiAPI(prompt) {
-            // IMPORTANT: Paste your new API key here
+            // ===================================================================
+            // ========================= IMPORTANT ===============================
+            //
+            // PASTE YOUR NEW API KEY HERE, INSIDE THE QUOTES
+            //
+            // ===================================================================
             const apiKey = "AIzaSyC9wpPlUniAv6IQRZEO2asMUszwEB_jiO4"; 
+            
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
             
             // Simple check to prevent sending request without a key
