@@ -1,342 +1,390 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>NCERT Class 11/12 Science Chatbot</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- MathJax for math rendering -->
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <style>
-    body {
-      background: linear-gradient(120deg, #f6d365, #fda085, #a8edea, #fed6e3);
-      font-family: 'Segoe UI', Arial, sans-serif;
-      font-size: 1.25em;
-      margin: 0;
-      color: #1a1a2e;
-    }
-    h1, h2 {
-      text-align: center;
-      color: #512da8;
-      text-shadow: 1px 1px 3px #ffe;
-      margin-bottom: 0.2em;
-    }
-    .chat-container {
-      max-width: 650px;
-      background: rgba(255,255,255,0.97);
-      margin: 2em auto 1em auto;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.13);
-      padding: 2em 2em 1em 2em;
-      min-height: 60vh;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5em;
-    }
-    .user-message, .bot-message {
-      margin: 0.7em 0;
-      border-radius: 15px;
-      max-width: 87%;
-      padding: 1em 1.2em;
-      font-size: 1.19em;
-      word-break: break-word;
-    }
-    .user-message {
-      align-self: flex-end;
-      background: #fff3e0;
-      border: 2px solid #f9a825;
-      text-align: right;
-    }
-    .bot-message {
-      align-self: flex-start;
-      background: #e0f7fa;
-      border: 2px solid #0277bd;
-      text-align: left;
-      animation: reveal 1.1s step-end;
-      white-space: pre-line;
-    }
-    @keyframes reveal {
-      0% {opacity: 0; transform: translateY(25px);}
-      100% {opacity: 1; transform: translateY(0);}
-    }
-    .motivational {
-      background: linear-gradient(100deg, #e0c3fc, #8ec5fc 80%);
-      margin: 1em 0;
-      padding: 1em;
-      border-radius: 10px;
-      color: #28446e;
-      font-weight: 600;
-      font-size: 1.13em;
-      border-left: 6px solid #512da8;
-      text-align: center;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 0.8em 0;
-      font-size: 1.03em;
-    }
-    th, td {
-      border: 1px solid #b39ddb;
-      padding: 0.46em 0.75em;
-      text-align: left;
-    }
-    th {
-      background: #b3e5fc;
-      color: #1a237e;
-    }
-    tr:nth-child(even) {
-      background: #f3e5f5;
-    }
-    .math {
-      background: #f1f8e9;
-      border-left: 6px solid #66bb6a;
-      margin: 1em 0;
-      padding: 0.7em 1.3em;
-      border-radius: 6px;
-      color: #00695c;
-      font-family: 'Roboto Mono', Consolas, monospace;
-      display: inline-block;
-    }
-    .input-area {
-      display: flex;
-      margin: 1.3em auto 1em auto;
-      width: 98%;
-      max-width: 650px;
-    }
-    .input-area input, .input-area button {
-      font-size: 1.15em;
-      padding: 0.72em;
-      border-radius: 9px;
-      border: none;
-    }
-    .input-area input {
-      flex: 1;
-      margin-right: 0.8em;
-      background: #e0f2f1;
-      outline: none;
-    }
-    .input-area button {
-      background: #43a047;
-      color: #fff;
-      cursor: pointer;
-      min-width: 100px;
-      transition: background 0.3s;
-    }
-    .input-area button:hover {
-      background: #388e3c;
-    }
-    @media (max-width:800px) {
-      .chat-container, .input-area { padding: 1em; }
-      body { font-size: 1.1em;}
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSC MTS 2024 Practice Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .option-btn {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .correct {
+            background-color: #22c55e !important; /* green-500 */
+            color: white !important;
+            border-color: #16a34a !important; /* green-600 */
+        }
+        .incorrect {
+            background-color: #ef4444 !important; /* red-500 */
+            color: white !important;
+            border-color: #dc2626 !important; /* red-600 */
+        }
+        .disabled-options .option-btn {
+            pointer-events: none;
+        }
+    </style>
 </head>
-<body>
-  <h1>NCERT Science Books Chatbot</h1>
-  <h2>Class 11 & 12 | Biology, Chemistry, Physics</h2>
-  <div class="motivational">
-    🌟 Every day is a chance to learn something extraordinary! <br>
-    <i>Ask about books, chapters, or concepts.<br> Math formulas supported too!</i>
-  </div>
-  <div class="chat-container" id="chat">
-    <div class="bot-message">
-      Hi 👋! I can help you with NCERT Class 11 & 12 Biology, Chemistry, and Physics books, chapters, and key concepts.<br>
-      <b>What would you like to know?</b>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="quiz-container p-4 sm:p-6 md:p-8">
+        <div id="quiz-header" class="text-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">SSC MTS 2024 Practice Quiz</h1>
+            <p class="text-gray-600 mt-2">Test your knowledge with these questions from the exam.</p>
+        </div>
+
+        <div id="quiz-body" class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+            <div id="question-container" class="mb-6">
+                <p class="text-lg sm:text-xl font-semibold mb-2">
+                    <span id="question-number"></span>. <span id="question-text"></span>
+                </p>
+                <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+                <p id="feedback" class="mt-4 text-sm font-medium"></p>
+            </div>
+
+            <div id="navigation" class="flex justify-between items-center border-t pt-4">
+                <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition-colors">Previous</button>
+                <div class="text-lg font-semibold">
+                    <span id="score">Score: 0</span> / <span id="total-questions">50</span>
+                </div>
+                <button id="next-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Next</button>
+            </div>
+        </div>
+
+        <div id="result-container" class="hidden text-center bg-white rounded-xl shadow-lg p-6 sm:p-8 mt-6">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-4">Quiz Complete!</h2>
+            <p class="text-xl mb-4">Your Final Score: <span id="final-score" class="font-bold"></span> out of 50</p>
+            <p id="final-message" class="text-gray-600 mb-6"></p>
+            <button id="restart-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">Restart Quiz</button>
+        </div>
     </div>
-  </div>
-  <form class="input-area" onsubmit="return sendMessage();">
-    <input type="text" id="userInput" placeholder="E.g. Class 12 Chemistry chapters or Laws of motion formula" autocomplete="off" required />
-    <button type="submit">Send</button>
-  </form>
 
-  <script>
-    // === CONFIGURATION ===
-    // To use OpenRouter API, set to true and add your key below
-    const USE_OPENROUTER = true; // set true to enable OpenRouter
-    const OPENROUTER_API_KEY = "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"; // <-- Replace with your OpenRouter API key
-
-    // === DATA ===
-    const bookData = {
-      "class 11": {
-        "biology": [
-          { title: "NCERT Biology Part I", chapters: 10 },
-          { title: "NCERT Biology Part II", chapters: 10 }
-        ],
-        "chemistry": [
-          { title: "NCERT Chemistry Part I", chapters: 7 },
-          { title: "NCERT Chemistry Part II", chapters: 7 }
-        ],
-        "physics": [
-          { title: "NCERT Physics Part I", chapters: 8 },
-          { title: "NCERT Physics Part II", chapters: 8 }
-        ]
-      },
-      "class 12": {
-        "biology": [
-          { title: "NCERT Biology Part I", chapters: 8 },
-          { title: "NCERT Biology Part II", chapters: 8 }
-        ],
-        "chemistry": [
-          { title: "NCERT Chemistry Part I", chapters: 9 },
-          { title: "NCERT Chemistry Part II", chapters: 7 }
-        ],
-        "physics": [
-          { title: "NCERT Physics Part I", chapters: 8 },
-          { title: "NCERT Physics Part II", chapters: 7 }
-        ]
-      }
-    };
-    const motivationLines = [
-      "✊ Keep going! Every question moves you forward.",
-      "🌈 Science is the poetry of reality—explore it!",
-      "🎯 Focus on one chapter at a time and master it.",
-      "🔬 Every formula unlocked is a power gained!"
-    ];
-    const mathExamples = {
-      "class 11 physics": [
-        { concept: "Newton's Second Law", equation: "F = m a" },
-        { concept: "Kinetic Energy", equation: "KE = \\frac{1}{2}mv^2" }
-      ],
-      "class 12 chemistry": [
-        { concept: "Gibbs Free Energy", equation: "G = H - TS" }
-      ]
-    };
-
-    // === CHATBOT LOGIC ===
-
-    // Simulate step-by-step, human-like reply
-    function typeWriterEffect(el, text, cb = MathJax.typesetPromise) {
-      let alloc = 0, out = '';
-      function writeln() {
-        if (alloc < text.length) {
-          out += text[alloc];
-          el.innerHTML = out;
-          alloc++;
-          if (text[alloc-1] === '\n') MathJax.typesetPromise();
-          setTimeout(writeln, 15 + Math.random()*30);
-        } else if (cb) {
-          cb();
-        }
-      }
-      writeln();
-    }
-
-    document.getElementById('userInput').focus();
-
-    function sendMessage() {
-      const input = document.getElementById('userInput').value.trim();
-      if (!input) return false;
-      showMessage(input, "user");
-      document.getElementById('userInput').value = '';
-      if (USE_OPENROUTER) {
-        processOpenRouter(input);
-      } else {
-        processBasicQuery(input.toLowerCase());
-      }
-      return false;
-    }
-
-    function showMessage(text, sender="bot") {
-      const chat = document.getElementById('chat');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = sender === "user" ? "user-message" : "bot-message";
-      if (sender === 'bot') {
-        chat.appendChild(msgDiv);
-        chat.scrollTop = chat.scrollHeight;
-        setTimeout(() => typeWriterEffect(msgDiv, text), 240);
-      } else {
-        msgDiv.innerText = text;
-        chat.appendChild(msgDiv);
-        chat.scrollTop = chat.scrollHeight;
-      }
-    }
-
-    // --- HANDLING BASIC DEMO LOGIC (HARDCODED) ---
-    function processBasicQuery(q) {
-      let found = false, lines = [];
-      if (Math.random() > 0.78) {
-        lines.push(`<div class="motivational">${motivationLines[Math.floor(Math.random()*motivationLines.length)]}</div>`);
-      }
-      for (let cls in bookData) {
-        if (q.includes(cls)) {
-          let subjects = bookData[cls];
-          for (let subject in subjects) {
-            if (q.includes(subject)) {
-              found = true;
-              lines.push(`\n=== <b style="color:#00796b">${cls.toUpperCase()} ${subject.toUpperCase()}</b> ===`);
-              lines.push('<table><tr><th>Book</th><th>Chapters</th></tr>');
-              subjects[subject].forEach(book => {
-                lines.push(`<tr><td>${book.title}</td><td>${book.chapters}</td></tr>`);
-              });
-              lines.push('</table>');
-              let mathKey = `${cls} ${subject}`;
-              if (mathExamples[mathKey]) {
-                mathExamples[mathKey].forEach(ex => {
-                  lines.push(`<div class="math"><b>${ex.concept}:</b> \\(${ex.equation}\\)</div>`);
-                });
-              }
+    <script>
+        // --- Data: Questions, Options, and Answers ---
+        const quizData = [
+             {
+                question: "The average monthly expenditure of a family was ₹8,600 during the first three months, ₹9,750 during the next four months and ₹9,920 during the last five months of a year. If the total savings during the year was ₹65,300, the average monthly income (in ₹) of the family was:",
+                options: ["14,975", "15,794", "15,479", "14,597"],
+                answer: "14,975"
+            },
+            {
+                question: "A thief saw a policeman, and he started running at a speed of 18 m/s. After 12 seconds, the policeman starts running behind the thief at a certain speed. If the policeman covered 864 meters distance to reach the thief, then the speed (in m/s) of the policeman is:",
+                options: ["28", "15", "30", "24"],
+                answer: "24"
+            },
+            {
+                question: "The ratio of the present age of A and B is 3: 1. Five years ago, the ratio of their ages was 5: 1. The age of A (in years) after eight years will be:",
+                options: ["30", "22", "38", "40"],
+                answer: "38"
+            },
+            {
+                question: "Two trains, 148 m and 152 m long, are running towards each other on parallel lines at 62 km/h and 46km/h, respectively. In what time will they be clear of each other from the moment they meet?",
+                options: ["5 sec", "20 sec", "10 sec", "15 sec"],
+                answer: "10 sec"
+            },
+            {
+                question: "The area of an equilateral triangle is (sqrt(5043)/4) sq. cm. The side of the equilateral triangle is:",
+                options: ["sqrt(23) cm", "sqrt(29) cm", "sqrt(47) cm", "sqrt(41) cm"],
+                answer: "sqrt(41) cm"
+            },
+            {
+                question: "In which state/union territory is Losar celebrated to mark the start of the new year in that region?",
+                options: ["Kerala", "Bihar", "Ladakh", "New Delhi"],
+                answer: "Ladakh"
+            },
+            {
+                question: "Kanak Rele, who established Nalanda Dance Research Centre, was a performer of which of the following classical dance forms of India?",
+                options: ["Mohiniyattam", "Manipuri", "Kathak", "Sattriya"],
+                answer: "Mohiniyattam"
+            },
+            {
+                question: "Which of the following acts introduced the system of dyarchy in the provincial administration in India?",
+                options: ["The Government of India Act of 1909", "The Government of India Act of 1919", "The Government of India Act of 1935", "The Government of India Act of 1947"],
+                answer: "The Government of India Act of 1919"
+            },
+            {
+                question: "Who was the founder of the Mauryan dynasty?",
+                options: ["Bindusara", "Vikramaditya", "Chandragupta Maurya", "Ashoka"],
+                answer: "Chandragupta Maurya"
+            },
+            {
+                question: "Which of the following books is written by Dadabhai Naoroji?",
+                options: ["Poverty and India", "Important Chapters of Poverty", "Poverty and Un-British Rule in India", "Economics History of India"],
+                answer: "Poverty and Un-British Rule in India"
+            },
+            {
+                question: "What is the chemical formula for sodium bicarbonate?",
+                options: ["NaCl", "Na2CO3", "NaHCO3", "NaOH"],
+                answer: "NaHCO3"
+            },
+            {
+                question: "The red colour of tomatoes is due to the presence of:",
+                options: ["limonene", "lycopene", "beta carotene", "alizarin"],
+                answer: "lycopene"
+            },
+            {
+                question: "In 1976, in which Part of the Indian Constitution under Article 51A were Fundamental Duties added?",
+                options: ["VI", "V", "IV A", "III"],
+                answer: "IV A"
+            },
+            {
+                question: "How many countries share their land borders with India?",
+                options: ["Nine", "Seven", "Six", "Eight"],
+                answer: "Seven"
+            },
+             {
+                question: "What does it imply when people say to 'read between the lines'?",
+                options: ["To read something fast", "To read with an ability to infer the meaning", "To skip initial and final lines in a paragraph", "To avoid detailed information"],
+                answer: "To read with an ability to infer the meaning"
+            },
+            {
+                question: "Who was the court poet of king Harshavardhana?",
+                options: ["Vatsbhatti", "Kalidas", "Ravikirti", "Banabhatta"],
+                answer: "Banabhatta"
+            },
+            {
+                question: "The Patkai hills are part of the ______ mountains.",
+                options: ["Western Ghats", "Eastern Ghats", "Purvachal", "Karakoram"],
+                answer: "Purvachal"
+            },
+            {
+                question: "In which of the following events did India get its first individual Olympic gold medal?",
+                options: ["Wrestling", "Boxing", "Weightlifting", "Shooting"],
+                answer: "Shooting"
+            },
+            {
+                question: "The term 'foot fault' is associated with which of the following games?",
+                options: ["Hockey", "Tennis", "Archery", "Basketball"],
+                answer: "Tennis"
+            },
+            {
+                question: "The autobiography 'Wings of Fire' chronicles the life of which notable Indian personality?",
+                options: ["Kiran Bedi", "APJ Abdul Kalam", "Arundhati Roy", "Ratan Tata"],
+                answer: "APJ Abdul Kalam"
+            },
+            {
+                question: "The 'Bathukamma' festival is associated with which state?",
+                options: ["Telangana", "Sikkim", "Punjab", "Tripura"],
+                answer: "Telangana"
+            },
+            {
+                question: "Which of the following dances is traditionally performed by the males of three adjacent states - Jharkhand, Odisha and West Bengal?",
+                options: ["Odissi", "Sattriya", "Kuchipudi", "Chhau"],
+                answer: "Chhau"
+            },
+            {
+                question: "To show the white feather is an idiom that means:",
+                options: ["To act cowardly", "To show anger", "To maintain peace", "To act bravely"],
+                answer: "To act cowardly"
+            },
+            {
+                question: "The word 'Reverent' is a synonym for:",
+                options: ["Rushed", "Important", "Related", "Respectful"],
+                answer: "Respectful"
+            },
+            {
+                question: "A building where animals are butchered is called an:",
+                options: ["Decanter", "Abattoir", "Burrow", "Cemetery"],
+                answer: "Abattoir"
+            },
+             {
+                question: "Ramani sells her car to Sarla at a loss of 15%. If Sarla pays ₹1,91,250 for it, then what is the cost price of the car for Ramani?",
+                options: ["₹2,25,000", "₹2,75,000", "₹2,25,600", "₹3,00,000"],
+                answer: "₹2,25,000"
+            },
+            {
+                question: "Three numbers are in the ratio 3: 4: 5 and their HCF is 60. The numbers are:",
+                options: ["20, 15, 12", "180, 240, 300", "45, 60, 75", "90, 120, 150"],
+                answer: "180, 240, 300"
+            },
+            {
+                question: "Calculate the Body Mass Index (BMI) of a person whose weight is 50 kg and height is 1.5 m.",
+                options: ["25.0 kg/m^2", "22.2 kg/m^2", "16.6 kg/m^2", "18.0 kg/m^2"],
+                answer: "22.2 kg/m^2"
+            },
+            {
+                question: "Which of the following is an Indian folk dance?",
+                options: ["Bharatanatyam", "Mohiniyattam", "Sattriya", "Bihu"],
+                answer: "Bihu"
+            },
+            {
+                question: "Which country won the 4th Asian Kho-Kho Championship 2023 event in the Men's category?",
+                options: ["Iran", "Indonesia", "South Korea", "India"],
+                answer: "India"
+            },
+            {
+                question: "The word 'Megalith' comes from two Greek words; 'megas' means great and 'lithas' means:",
+                options: ["stone", "structure", "burial", "monument"],
+                answer: "stone"
+            },
+            {
+                question: "Where was Global Technology Summit 2022 held?",
+                options: ["New Delhi", "Jaipur", "Varanasi", "Bengaluru"],
+                answer: "New Delhi"
+            },
+            {
+                question: "The Ganesh-rath is one of the finest monolithic temples at:",
+                options: ["Mahabalipuram", "Sarnath", "Gangaikondacholapuram", "Kanchipuram"],
+                answer: "Mahabalipuram"
+            },
+            {
+                question: "Jyotiba Phule belonged from which state?",
+                options: ["Tamil Nadu", "Maharashtra", "Gujarat", "Karnataka"],
+                answer: "Maharashtra"
+            },
+            {
+                question: "Where was the Hindu college established in the year 1791 to teach ancient Sanskrit texts?",
+                options: ["Madras", "Calcutta", "Banaras", "Agra"],
+                answer: "Banaras"
+            },
+            {
+                question: "On boiling an egg, why does the outer part become opaque and white?",
+                options: ["The heat causes a reaction of the egg with water and makes it opaque.", "The heat causes a change in the crystal structure of egg yolk.", "The heat causes a change in the structure of egg protein.", "The heat causes denaturation, hardening the albumin and colouring it opaque white"],
+                answer: "The heat causes denaturation, hardening the albumin and colouring it opaque white"
+            },
+            {
+                question: "Which of the following National Parks is located in Madhya Pradesh?",
+                options: ["Nanda Devi", "Periyar", "Bandhavgarh", "Silent Valley"],
+                answer: "Bandhavgarh"
+            },
+            {
+                question: "According to Article 74(1), who is at the head of the Council of Ministers?",
+                options: ["Speaker of the House", "Prime Minister", "Chief Justice", "President"],
+                answer: "Prime Minister"
+            },
+            {
+                question: "Who among the following personalities was the recipient of the Lata Mangeshkar Award for Music 2021, presented by the Madhya Pradesh government?",
+                options: ["Kumar Sanu", "Udit Narayan", "Shaan", "Darshan Raval"],
+                answer: "Kumar Sanu"
+            },
+            {
+                question: "The first post-independence National Games were hosted by which of the following cities?",
+                options: ["Delhi", "Jabalpur", "Lucknow", "Madras"],
+                answer: "Lucknow"
+            },
+            {
+                question: "The Hindu temples 'Hinglaj Mata' and 'Katasraj' are located in which neighbouring country of India?",
+                options: ["Pakistan", "Bhutan", "Sri Lanka", "Nepal"],
+                answer: "Pakistan"
+            },
+            {
+                question: "The officer known as Diwan belonged to which of the following departments of the Mughal empire during Akbar's reign?",
+                options: ["Military", "Foreign affairs", "Judicial", "Finance"],
+                answer: "Finance"
+            },
+            {
+                question: "Which of the following Articles on Fundamental Duties was added to the Indian Constitution by the 42nd Constitutional Amendment Act?",
+                options: ["40", "52-A", "51-A", "45A"],
+                answer: "51-A"
+            },
+            {
+                question: "The famous Hindi novel 'Maila Aanchal' is written by:",
+                options: ["Mridula Garg", "Shrilal Shukla", "Phanishwar Nath Renu", "Premchand"],
+                answer: "Phanishwar Nath Renu"
+            },
+            {
+                question: "The average separation between the sun and the earth in terms of light years is 8.311 minutes. Here, minutes indicate:",
+                options: ["speed", "time", "velocity", "distance"],
+                answer: "time"
+            },
+            {
+                question: "The word 'Ecstatic' is a synonym for:",
+                options: ["Shocked", "Happy", "Angry", "Interested"],
+                answer: "Happy"
+            },
+            {
+                question: "A piece of cake is an idiom that means:",
+                options: ["A slice of cake for eating", "Easy to do or achieve", "A cake which is sold as a piece", "A cake that broke into pieces"],
+                answer: "Easy to do or achieve"
+            },
+            {
+                question: "The synonym for 'Energy' is:",
+                options: ["Frailty", "strife", "Speed", "Power"],
+                answer: "Power"
+            },
+            {
+                question: "To 'discern' means to:",
+                options: ["Ignore", "Confuse", "Perceive", "Fabricate"],
+                answer: "Perceive"
+            },
+            {
+                question: "The word 'insight' means:",
+                options: ["craziness", "folly", "glitch", "a deep understanding"],
+                answer: "a deep understanding"
             }
-          }
+        ];
+
+        // --- DOM Elements ---
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainerEl = document.getElementById('options-container');
+        const feedbackEl = document.getElementById('feedback');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const scoreEl = document.getElementById('score');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const quizBodyEl = document.getElementById('quiz-body');
+        const resultContainerEl = document.getElementById('result-container');
+        const finalScoreEl = document.getElementById('final-score');
+        const finalMessageEl = document.getElementById('final-message');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // --- State Variables ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+
+        // --- Functions ---
+
+        /**
+         * Loads and displays the current question and its options.
+         */
+        function loadQuestion() {
+            // Clear previous question's content
+            feedbackEl.textContent = '';
+            optionsContainerEl.innerHTML = '';
+            optionsContainerEl.classList.remove('disabled-options');
+
+            // Get current question data
+            const currentQuestion = quizData[currentQuestionIndex];
+
+            // Update question number and text
+            questionNumberEl.textContent = currentQuestionIndex + 1;
+            questionTextEl.textContent = currentQuestion.question;
+            totalQuestionsEl.textContent = quizData.length;
+
+            // Create and display option buttons
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-btn', 'w-full', 'p-3', 'text-left', 'border-2', 'border-gray-300', 'rounded-lg', 'hover:bg-gray-200', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-400');
+                button.onclick = () => selectAnswer(button, option);
+                optionsContainerEl.appendChild(button);
+            });
+
+            // Restore user's previous answer if it exists
+            if (userAnswers[currentQuestionIndex] !== null) {
+                checkAnswer(userAnswers[currentQuestionIndex].selectedOption, true);
+            }
+            
+            updateNavigation();
         }
-      }
 
-      // Demo math if asked
-      if (!found && /formula|equation|math|motion|force|work|energy|enthalpy|mole|law/.test(q)) {
-        found = true;
-        lines.push("<b>Here's a sample equation:</b>");
-        lines.push(`<div class="math">Work Done: \\( W = F \\cdot d \\)</div>`);
-      }
-
-      if (!found) {
-        lines.push(
-          "Sorry, I can only assist with Biology, Chemistry, and Physics for Class 11 & 12 at the moment.<br>" +
-          "<span style='color: #d84315;'>Try asking: <i>Class 12 Chemistry chapters</i> or <i>Class 11 Physics formulas</i>.</span>"
-        );
-      }
-      showMessage(lines.join('\n'), "bot");
-    }
-
-    // --- OPTIONAL: OPENROUTER AI API LOGIC ---
-    const openrouterSystemPrompt = 
-      "You are an expert guide for Indian students. Help with NCERT Class 11 and 12 Physics, Chemistry, and Biology. " +
-      "Give book, chapter, and concept details, using math symbols as LaTeX when needed. Be motivational, clear, and concise. " + 
-      "Never answer for other subjects. Show one point per line, step-by-step, in a human style.";
-
-    let chatHistory = [
-      { role: "system", content: openrouterSystemPrompt }
-    ];
-
-    function processOpenRouter(userText) {
-      // Update chat history
-      chatHistory.push({ role: "user", content: userText });
-      showMessage('<i>Thinking...</i>', 'bot');
-      fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${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}`, // <-- Your key here
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "deepseek/deepseek-moe:free", // or any available OpenRouter model
-          messages: chatHistory,
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        let aiReply = data?.choices?.[0]?.message?.content || "Sorry, couldn't fetch answer.";
-        chatHistory.push({ role: "assistant", content: aiReply });
-        // Remove the "Thinking..." message:
-        let chat = document.getElementById('chat');
-        chat.removeChild(chat.lastChild);
-        showMessage(aiReply, 'bot');
-      })
-      .catch(err => {
-        let chat = document.getElementById('chat');
-        chat.removeChild(chat.lastChild);
-        showMessage("Sorry, the service is temporarily unavailable. Please try again later.", 'bot');
-      });
-    }
-  </script>
-</body>
-</html>
+        /**
+         * Handles the user's answer selection.
+         * @param {HTMLButtonElement} selectedButton - The button element that was clicked.
+         * @param {string} selectedOption - The text content of the selected option.
+         */
+        function selectAnswer(selectedButton, selectedOption) {
+            // Store the user's answer
+            userAnswers[currentQuestionIndex] = { selectedOption };
+            chec
